@@ -22,6 +22,14 @@
     <%@ include file="../layouts/header.jsp"%>
     <div class="col-12 mx-auto">
         <h2 class="text-center mt-4">User List</h2>
+        <div class="d-flex justify-content-between mt-4">
+            <a href="/users/create" class="btn btn-success">Create</a>
+            <form class="d-flex" method="get" action="/users/search">
+                <input type="search" class="form-control" name="keyword" value=""/>
+                <button type="submit" class="btn btn-primary btn-sm">Search</button>
+            </form>
+        </div>
+
         <table class="table table-striped mt-4">
             <thead>
             <tr>
@@ -39,8 +47,8 @@
                 <td><%= user.getUsername()%></td>
                 <td><%= user.getEmail()%></td>
                 <td>
-                    <a href="/users/edit?id=1" class="btn btn-sm btn-primary">Edit</a>
-                    <a href="/users/delete?id=1" class="btn btn-sm btn-danger">Delete</a>
+                    <a href="/users/edit?id=<%= user.getId()%>" class="btn btn-sm btn-primary">Edit</a>
+                    <a onclick="return confirm('Are you sure?')" href="/users/delete?id=<%= user.getId()%>" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
             <% } %>
