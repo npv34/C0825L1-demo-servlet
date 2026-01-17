@@ -1,4 +1,4 @@
-package com.codegym.myapp;
+package com.codegym.myapp.controllers;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

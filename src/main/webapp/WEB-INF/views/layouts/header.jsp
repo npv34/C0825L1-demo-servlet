@@ -17,7 +17,7 @@
                         User Manager
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="/users/add">Add new</a></li>
+                        <li><a class="dropdown-item" href="/users/create">Add new</a></li>
                         <li><a class="dropdown-item" href="/users">Show List</a></li>
                     </ul>
                 </li>
