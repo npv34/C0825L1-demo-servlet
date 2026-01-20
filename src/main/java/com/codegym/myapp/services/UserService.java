@@ -1,32 +1,40 @@
 package com.codegym.myapp.services;
 
 import com.codegym.myapp.entities.User;
+import com.codegym.myapp.models.Database;
+import com.codegym.myapp.models.UserModel;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {
-    private static final List<User> users = new ArrayList<>();
+    private static final UserModel userModel = new UserModel(Database.getConnection());
 
     public UserService() {
     }
 
-    public void initData(){
-        users.add(new User(1, "john_doe", "password123", "john@gmail.com"));
-        users.add(new User(2, "jane_smith", "securepass", "smith@gmail.com"));
-        users.add(new User(3, "jane_smith", "securepass", "smith@gmail.com"));
-        users.add(new User(4, "jane_smith", "securepass", "smith@gmail.com"));
-    }
+    public static List<User> getAllUsers() throws SQLException {
+        List<User> users = new ArrayList<>();
+        ResultSet result = userModel.getAll();
+        while (result.next()){
+            int id = result.getInt("id");
+            String username = result.getString("username");
+            String password = result.getString("password");
+            String email = result.getString("email");
 
-    public static List<User> getAllUsers() {
+            User user = new User(id, username, password, email);
+            users.add(user);
+        }
         return users;
     }
 
-    public static void renderPageListUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public static void renderPageListUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, SQLException {
         // truyen danh sach users sang JSP
         List<User> users = UserService.getAllUsers();
         req.setAttribute("users", users);
@@ -39,56 +47,37 @@ public class UserService {
                 .forward(req, resp);
     }
 
-    public static void createUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public static void createUser(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
         // lay du lieu tu form
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String email = request.getParameter("email");
-        User lastUser = users.get(users.size() - 1);
-        // tao user moi
-        User newUser = new User();
-        newUser.setId(lastUser.getId() + 1);
-        newUser.setUsername(username);
-        newUser.setPassword(password);
-        newUser.setEmail(email);
-        // luu user moi vao danh sach
-        users.add(newUser);
+        // luu vao db
+        userModel.create(username, password, email);
         // chuyen huong ve trang danh sach user
         response.sendRedirect("/users");
     }
 
-    public static void deleteUserById(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public static void deleteUserById(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
         String id = request.getParameter("id");
-        //  tim user trong danh sach theo id va xoa
-        User userDelete = null;
-        for (User user : users) {
-            if (String.valueOf(user.getId()).equals(id)) {
-                userDelete = user;
-                break;
-            }
-        }
-
-        // xoa user neu tim thay
-        if (userDelete != null) {
-            users.remove(userDelete);
-        }
-
+        userModel.deleteById(Integer.parseInt(id));
         // chuyen huong ve trang danh sach user
         response.sendRedirect("/users");
     }
 
-    public static void renderFormEditUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public static void renderFormEditUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, SQLException {
         String id = req.getParameter("id");
-        // tim user trong danh sach theo id
-        User userEdit = null;
-        for (User user : users) {
-            if (String.valueOf(user.getId()).equals(id)) {
-                userEdit = user;
-                break;
+        // tim user trong db theo id
+        ResultSet resultSet = userModel.getById(Integer.parseInt(id));
+        if (resultSet != null) {
+            User userEdit = null;
+            while (resultSet.next()) {
+                int userId = resultSet.getInt("id");
+                String username = resultSet.getString("username");
+                String password = resultSet.getString("password");
+                String email = resultSet.getString("email");
+                userEdit = new User(userId, username, password, email);
             }
-        }
-
-        if (userEdit != null) {
             req.setAttribute("user", userEdit);
             req.getRequestDispatcher("/WEB-INF/views/users/edit.jsp")
                     .forward(req, resp);
@@ -99,23 +88,14 @@ public class UserService {
         }
     }
 
-    public static void updateUser(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    public static void updateUser(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException, SQLException {
         String id = req.getParameter("id");
         String username = req.getParameter("username");
         String email = req.getParameter("email");
 
-
-        User userEdit = null;
-        for (User user : users) {
-            if (String.valueOf(user.getId()).equals(id)) {
-                userEdit = user;
-                break;
-            }
-        }
-
-        if (userEdit != null){
-            userEdit.setUsername(username);
-            userEdit.setEmail(email);
+        ResultSet resultSet = userModel.getById(Integer.parseInt(id));
+        if (resultSet != null){
+            userModel.updateById(Integer.parseInt(id), username, email);
             res.sendRedirect("/users");
         } else {
             // khong tim thay user, hien thi trang 404
@@ -127,12 +107,6 @@ public class UserService {
     public static void searchUser(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String keyword = request.getParameter("keyword");
         List<User> result = new ArrayList<>();
-        for (User user: users) {
-            if (user.getUsername().equals(keyword)) {
-                result.add(user);
-            }
-        }
-        System.out.println(result.size());
         request.setAttribute("users", result);
         request.getRequestDispatcher("/WEB-INF/views/users/list.jsp")
                 .forward(request, response);
