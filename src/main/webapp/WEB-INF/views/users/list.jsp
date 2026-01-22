@@ -41,18 +41,23 @@
             </thead>
             <tbody>
             <%-- Example static data, replace with dynamic data from server --%>
-            <% for (User user : users) { %>
-            <tr>
-                <th scope="row"><%= user.getId()%></th>
-                <td><%= user.getUsername()%></td>
-                <td><%= user.getEmail()%></td>
-                <td>
-                    <a href="/users/edit?id=<%= user.getId()%>" class="btn btn-sm btn-primary">Edit</a>
-                    <a onclick="return confirm('Are you sure?')" href="/users/delete?id=<%= user.getId()%>" class="btn btn-sm btn-danger">Delete</a>
-                </td>
-            </tr>
+            <% if (users == null || users.isEmpty()) { %>
+                <tr>
+                    <td colspan="4" class="text-center">No users found.</td>
+                </tr>
+            <% } else { %>
+                <% for (User user : users) { %>
+                <tr>
+                    <th scope="row"><%= user.getId()%></th>
+                    <td><%= user.getUsername()%></td>
+                    <td><%= user.getEmail()%></td>
+                    <td>
+                        <a href="/users/edit?id=<%= user.getId()%>" class="btn btn-sm btn-primary">Edit</a>
+                        <a onclick="return confirm('Are you sure?')" href="/users/delete?id=<%= user.getId()%>" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+                <% } %>
             <% } %>
-            <%-- Add more user rows as needed --%>
             </tbody>
         </table>
     </div>

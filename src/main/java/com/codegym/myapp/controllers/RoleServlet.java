@@ -1,6 +1,6 @@
 package com.codegym.myapp.controllers;
 
-import com.codegym.myapp.models.Database;
+import com.codegym.myapp.services.RoleService;
 import com.codegym.myapp.services.UserService;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -12,8 +12,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet(name = "userServlet", urlPatterns = {"/users/*"})
-public class UserServlet extends HttpServlet {
+@WebServlet(name = "roleServlet", urlPatterns = {"/roles/*"})
+public class RoleServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -30,34 +30,24 @@ public class UserServlet extends HttpServlet {
         switch (pathInfo) {
             case "/":
                 try {
-                    UserService.renderPageListUser(req, resp);
+                    RoleService.renderPageListRole(req, resp);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
                 break;
-            case "/create":
-                UserService.renderFormCreateUser(req, resp);
-                break;
             case "/delete":
                 try {
-                    UserService.deleteUserById(req, resp);
+                    RoleService.deleteRoleById(req, resp);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
                 break;
             case "/edit":
-                try {
-                    UserService.renderFormEditUser(req, resp);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                break;
-            case "/search":
-                try {
-                    UserService.searchUser(req, resp);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+//                try {
+//                   // RoleService.renderFormEditRole(req, resp);
+//                } catch (SQLException e) {
+//                    throw new RuntimeException(e);
+//                }
                 break;
         }
     }
@@ -68,23 +58,14 @@ public class UserServlet extends HttpServlet {
         if (pathInfo == null) {
             pathInfo = "/";
         }
-
         switch (pathInfo) {
             case "/create":
                 try {
-                    UserService.createUser(req, resp);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                break;
-            case "/edit":
-                try {
-                    UserService.updateUser(req, resp);
+                    RoleService.createRole(req, resp);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
                 break;
         }
     }
-
 }

@@ -104,11 +104,28 @@ public class UserService {
         }
     }
 
-    public static void searchUser(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public static void searchUser(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, SQLException {
         String keyword = request.getParameter("keyword");
         List<User> result = new ArrayList<>();
+        ResultSet rs = userModel.search(keyword);
+        while (rs.next()){
+            int id = rs.getInt("id");
+            String username = rs.getString("username");
+            String password = rs.getString("password");
+            String email = rs.getString("email");
+            User user = new User(id, username, password, email);
+            result.add(user);
+        }
         request.setAttribute("users", result);
         request.getRequestDispatcher("/WEB-INF/views/users/list.jsp")
                 .forward(request, response);
+    }
+
+    public static int getTotalUserCount() throws SQLException {
+        ResultSet resultSet = userModel.getTotalUsers();
+        if (resultSet.next()) {
+            return resultSet.getInt(1);
+        }
+        return 0;
     }
 }
