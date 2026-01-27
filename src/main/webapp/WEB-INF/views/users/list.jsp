@@ -36,6 +36,7 @@
                 <th scope="col">ID</th>
                 <th scope="col">Username</th>
                 <th scope="col">Email</th>
+                <th scope="col">Role</th>
                 <th scope="col">Actions</th>
             </tr>
             </thead>
@@ -51,6 +52,7 @@
                     <th scope="row"><%= user.getId()%></th>
                     <td><%= user.getUsername()%></td>
                     <td><%= user.getEmail()%></td>
+                    <td><%= user.getRole() != null ? user.getRole().getName() : "Chua co role"  %></td>
                     <td>
                         <a href="/users/edit?id=<%= user.getId()%>" class="btn btn-sm btn-primary">Edit</a>
                         <a onclick="return confirm('Are you sure?')" href="/users/delete?id=<%= user.getId()%>" class="btn btn-sm btn-danger">Delete</a>

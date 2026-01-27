@@ -2,15 +2,10 @@ package com.codegym.myapp.models;
 
 import java.sql.*;
 
-public class RoleModel {
-    private Connection conn;
-
-    public RoleModel(Connection conn) {
-        this.conn = conn;
-    }
+public class RoleModel extends BaseModel{
 
     public ResultSet getAll() throws SQLException {
-        String sql = "SELECT * FROM roles";
+        String sql = "CALL getAllRoleWithTotalUser()";
         Statement statement = conn.prepareStatement(sql);
         return statement.executeQuery(sql);
     }
@@ -25,7 +20,7 @@ public class RoleModel {
         String sql = "SELECT * FROM roles WHERE id = ?";
         PreparedStatement statement = conn.prepareStatement(sql);
         statement.setInt(1, id);
-        return statement.executeQuery(sql);
+        return statement.executeQuery();
     }
 
     public void updateById(int id, String name) throws SQLException {

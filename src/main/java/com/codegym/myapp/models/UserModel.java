@@ -2,16 +2,9 @@ package com.codegym.myapp.models;
 
 import com.codegym.myapp.entities.User;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
-public class UserModel {
-    private Connection conn;
-    public UserModel(Connection conn) {
-        this.conn = conn;
-    }
+public class UserModel extends BaseModel {
 
     public ResultSet getAll() throws SQLException {
         String sql = "SELECT * FROM users";
@@ -31,15 +24,23 @@ public class UserModel {
         return statement.executeQuery(sql);
     }
 
-    public void updateById(int id, String username, String email) throws SQLException {
-        String sql = "UPDATE users SET username = '" + username + "', email = '" + email + "' WHERE id = " + id;
-        Statement statement = conn.prepareStatement(sql);
-        statement.executeUpdate(sql);
+    public void updateById(int id, String username, String email, int roleId) throws SQLException {
+        String sql = "UPDATE users SET username = ? , email = ? , role_id = ? WHERE id = ?";
+        PreparedStatement statement = conn.prepareStatement(sql);
+        statement.setString(1, username);
+        statement.setString(2, email);
+        statement.setInt(3, roleId);
+        statement.setInt(4, id);
+        statement.execute();
     }
-    public void create(String username, String password, String email) throws SQLException {
-        String sql = "INSERT INTO users (username, password, email) VALUES ('" + username + "', '" + password + "', '" + email + "')";
-        Statement statement = conn.prepareStatement(sql);
-        statement.executeUpdate(sql);
+    public void create(String username, String password, String email, int roleId) throws SQLException {
+        String sql = "INSERT INTO users (username, password, email, role_id) VALUES (?, ?, ?, ?)";
+        PreparedStatement statement = conn.prepareStatement(sql);
+        statement.setString(1, username);
+        statement.setString(2, password);
+        statement.setString(3, email);
+        statement.setInt(4, roleId);
+        statement.execute();
     }
 
     public ResultSet search(String keyword) throws SQLException {

@@ -1,7 +1,9 @@
 package com.codegym.myapp.services;
 
+import com.codegym.myapp.entities.Role;
 import com.codegym.myapp.entities.User;
 import com.codegym.myapp.models.Database;
+import com.codegym.myapp.models.RoleModel;
 import com.codegym.myapp.models.UserModel;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {
-    private static final UserModel userModel = new UserModel(Database.getConnection());
+    private static final UserModel userModel = new UserModel();
+    private static final RoleModel roleModel = new RoleModel();
 
     public UserService() {
     }
@@ -27,8 +30,19 @@ public class UserService {
             String username = result.getString("username");
             String password = result.getString("password");
             String email = result.getString("email");
+            int roleId = result.getInt("role_id");
+
+            // Lay thong tin role tu db dua vao roleId
+            ResultSet resultSet = roleModel.getById(roleId);
+            Role role = null;
+            if (resultSet.next()) {
+                String roleName = resultSet.getString("name");
+                role = new Role(roleId, roleName);
+            }
 
             User user = new User(id, username, password, email);
+            // Gan role cho user
+            user.setRole(role);
             users.add(user);
         }
         return users;
@@ -42,9 +56,25 @@ public class UserService {
                 .forward(req, resp);
     }
 
-    public static void renderFormCreateUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public static void renderFormCreateUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, SQLException {
+        List<Role> roles = getRoleList();
+        req.setAttribute("roles", roles);
         req.getRequestDispatcher("/WEB-INF/views/users/create.jsp")
                 .forward(req, resp);
+    }
+
+    private static List<Role> getRoleList() throws SQLException {
+        // get all roles
+        List<Role> roles = new ArrayList<>();
+        ResultSet result = roleModel.getAll();
+        while (result.next()){
+            int id = result.getInt("id");
+            String name = result.getString("name");
+            Role role = new Role(id, name);
+            roles.add(role);
+        }
+        // pass roles to jsp
+        return roles;
     }
 
     public static void createUser(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
@@ -52,8 +82,9 @@ public class UserService {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String email = request.getParameter("email");
+        int roleId = Integer.parseInt(request.getParameter("roleId"));
         // luu vao db
-        userModel.create(username, password, email);
+        userModel.create(username, password, email, roleId);
         // chuyen huong ve trang danh sach user
         response.sendRedirect("/users");
     }
@@ -67,6 +98,8 @@ public class UserService {
 
     public static void renderFormEditUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, SQLException {
         String id = req.getParameter("id");
+        List<Role> roles = getRoleList();
+        req.setAttribute("roles", roles);
         // tim user trong db theo id
         ResultSet resultSet = userModel.getById(Integer.parseInt(id));
         if (resultSet != null) {
@@ -76,7 +109,18 @@ public class UserService {
                 String username = resultSet.getString("username");
                 String password = resultSet.getString("password");
                 String email = resultSet.getString("email");
+                int currentRoleId = resultSet.getInt("role_id");
+                // Lay thong tin role tu db dua vao roleId
+                ResultSet roleResultSet = roleModel.getById(currentRoleId);
+                Role role = null;
+                if (roleResultSet.next()) {
+                    String roleName = roleResultSet.getString("name");
+                    role = new Role(currentRoleId, roleName);
+                }
+
                 userEdit = new User(userId, username, password, email);
+                // Gan role cho user
+                userEdit.setRole(role);
             }
             req.setAttribute("user", userEdit);
             req.getRequestDispatcher("/WEB-INF/views/users/edit.jsp")
@@ -92,10 +136,11 @@ public class UserService {
         String id = req.getParameter("id");
         String username = req.getParameter("username");
         String email = req.getParameter("email");
+        int roleId = Integer.parseInt(req.getParameter("roleId"));
 
         ResultSet resultSet = userModel.getById(Integer.parseInt(id));
         if (resultSet != null){
-            userModel.updateById(Integer.parseInt(id), username, email);
+            userModel.updateById(Integer.parseInt(id), username, email, roleId);
             res.sendRedirect("/users");
         } else {
             // khong tim thay user, hien thi trang 404

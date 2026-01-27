@@ -1,4 +1,5 @@
-<%--
+<%@ page import="java.util.List" %>
+<%@ page import="com.codegym.myapp.entities.Role" %><%--
   Created by IntelliJ IDEA.
   User: luanpv
   Date: 1/15/26
@@ -10,7 +11,9 @@
 <head>
     <title>Title</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
+    <%
+        List<Role> roles = (List<Role>) request.getAttribute("roles");
+    %>
 </head>
 <body>
 <div class="container">
@@ -29,6 +32,14 @@
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="mb-3">
+                <label for="role" class="form-label">Role</label>
+                <select class="form-select" id="role" name="roleId" required>
+                    <% for (Role role : roles) { %>
+                        <option value="<%= role.getId() %>"><%= role.getName() %></option>
+                    <% } %>
+                </select>
             </div>
             <button type="submit" class="btn btn-primary">Create</button>
             <a class="btn btn-info" href="/users/">Cancel</a>

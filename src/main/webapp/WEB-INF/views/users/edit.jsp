@@ -1,4 +1,6 @@
-<%@ page import="com.codegym.myapp.entities.User" %><%--
+<%@ page import="com.codegym.myapp.entities.User" %>
+<%@ page import="com.codegym.myapp.entities.Role" %>
+<%@ page import="java.util.List" %><%--
   Created by IntelliJ IDEA.
   User: luanpv
   Date: 1/15/26
@@ -9,7 +11,9 @@
 
 <%
     User userEdit = (User) request.getAttribute("user");
+    List<Role> roles = (List<Role>) request.getAttribute("roles");
 %>
+
 <html>
 <head>
     <title>Title</title>
@@ -29,6 +33,14 @@
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" value="<%= userEdit.getEmail()%>" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="role" class="form-label">Role</label>
+                <select class="form-select" id="role" name="roleId" required>
+                    <% for (Role role : roles) { %>
+                    <option <%= userEdit.getRole().getId() == role.getId() ? "selected" : "" %> value="<%= role.getId() %>"><%= role.getName() %></option>
+                    <% } %>
+                </select>
             </div>
             <button type="submit" class="btn btn-primary">Update</button>
             <a class="btn btn-info" href="/users/">Cancel</a>

@@ -36,7 +36,11 @@ public class UserServlet extends HttpServlet {
                 }
                 break;
             case "/create":
-                UserService.renderFormCreateUser(req, resp);
+                try {
+                    UserService.renderFormCreateUser(req, resp);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             case "/delete":
                 try {

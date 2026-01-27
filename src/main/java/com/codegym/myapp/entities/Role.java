@@ -3,6 +3,7 @@ package com.codegym.myapp.entities;
 public class Role {
     private int id;
     private String name;
+    private int totalUser;
 
     public Role() {
     }
@@ -26,5 +27,12 @@ public class Role {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getTotalUser() {
+        return totalUser;
+    }
+    public void setTotalUser(int totalUser) {
+        this.totalUser = totalUser;
     }
 }

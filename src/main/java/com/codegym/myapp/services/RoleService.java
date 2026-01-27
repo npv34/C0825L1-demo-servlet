@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RoleService {
-    private static final RoleModel roleModel = new RoleModel(Database.getConnection());
+    private static final RoleModel roleModel = new RoleModel();
 
     public RoleService() {
     }
@@ -25,8 +25,10 @@ public class RoleService {
         while (result.next()){
             int id = result.getInt("id");
             String name = result.getString("name");
+            int totalUser = result.getInt("totalUser");
 
             Role role = new Role(id, name);
+            role.setTotalUser(totalUser);
             roles.add(role);
         }
         return roles;
