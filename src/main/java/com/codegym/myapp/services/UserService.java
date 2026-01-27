@@ -30,18 +30,11 @@ public class UserService {
             String username = result.getString("username");
             String password = result.getString("password");
             String email = result.getString("email");
+            String roleName = result.getString("name");
             int roleId = result.getInt("role_id");
-
-            // Lay thong tin role tu db dua vao roleId
-            ResultSet resultSet = roleModel.getById(roleId);
-            Role role = null;
-            if (resultSet.next()) {
-                String roleName = resultSet.getString("name");
-                role = new Role(roleId, roleName);
-            }
-
             User user = new User(id, username, password, email);
             // Gan role cho user
+            Role role = new Role(roleId, roleName);
             user.setRole(role);
             users.add(user);
         }

@@ -7,7 +7,7 @@ import java.sql.*;
 public class UserModel extends BaseModel {
 
     public ResultSet getAll() throws SQLException {
-        String sql = "SELECT * FROM users";
+        String sql = "CALL getAllUserWithRole()";
         Statement statement = conn.prepareStatement(sql);
         return statement.executeQuery(sql);
     }
